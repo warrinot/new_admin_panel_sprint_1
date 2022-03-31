@@ -1,20 +1,28 @@
 import sqlite3
 
-import psycopg2
+from db_psycopg import pg_get_connection
+from db_sqlite import sqlite_get_connection
+from pg_saver import PostgresSaver
 from psycopg2.extensions import connection as _connection
-from psycopg2.extras import DictCursor
+from sqlite_loader import SQLiteLoader
+
+BATCH_SIZE = 500
 
 
-def load_from_sqlite(connection: sqlite3.Connection, pg_conn: _connection):
+def load_from_sqlite(connection: sqlite3.Connection, pg_connection: _connection):
     """Основной метод загрузки данных из SQLite в Postgres"""
-    # postgres_saver = PostgresSaver(pg_conn)
-    # sqlite_loader = SQLiteLoader(connection)
 
-    # data = sqlite_loader.load_movies()
-    # postgres_saver.save_all_data(data)
+    postgres_saver = PostgresSaver(pg_connection)
+    sqlite_loader = SQLiteLoader(connection)
+
+    tables = sqlite_loader.get_tables()
+    for table in tables:
+        data = sqlite_loader.load_table_gen(table, batch_size=BATCH_SIZE)
+        for chunk in data:
+            postgres_saver.save_all_data(chunk, table)
 
 
 if __name__ == '__main__':
     dsl = {'dbname': 'movies_database', 'user': 'app', 'password': '123qwe', 'host': '127.0.0.1', 'port': 5432}
-    with sqlite3.connect('db.sqlite') as sqlite_conn, psycopg2.connect(**dsl, cursor_factory=DictCursor) as pg_conn:
+    with sqlite_get_connection('db.sqlite') as sqlite_conn, pg_get_connection(dsl) as pg_conn:
         load_from_sqlite(sqlite_conn, pg_conn)
