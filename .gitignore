@@ -2,4 +2,11 @@
 .idea/
 
 # Virtual env
-/venv
+venv/
+
+# env file
+.env
+
+# Cache
+__pycache__/
+*.pyc
