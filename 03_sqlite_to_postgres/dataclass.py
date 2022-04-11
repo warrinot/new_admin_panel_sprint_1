@@ -1,6 +1,6 @@
 import datetime
 import uuid
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 
 class DataClassGetter:
@@ -33,7 +33,7 @@ class FilmWork:
     type: str
     created_at: datetime.datetime
     updated_at: datetime.datetime
-    id: uuid.UUID = field(default_factory=uuid.uuid4)
+    id: uuid.UUID
 
 
 @dataclass
@@ -42,15 +42,15 @@ class Genre:
     description: str
     created_at: datetime.datetime
     updated_at: datetime.datetime
-    id: uuid.UUID = field(default_factory=uuid.uuid4)
+    id: uuid.UUID
 
 
 @dataclass
 class GenreFilmWork:
     created_at: datetime.datetime
-    film_work_id: uuid.UUID = field(default_factory=uuid.uuid4)
-    genre_id: uuid.UUID = field(default_factory=uuid.uuid4)
-    id: uuid.UUID = field(default_factory=uuid.uuid4)
+    film_work_id: uuid.UUID
+    genre_id: uuid.UUID
+    id: uuid.UUID
 
 
 @dataclass
@@ -58,13 +58,13 @@ class Person:
     full_name: str
     created_at: datetime.datetime
     updated_at: datetime.datetime
-    id: uuid.UUID = field(default_factory=uuid.uuid4)
+    id: uuid.UUID
 
 
 @dataclass
 class PersonFilmWork:
     role: str
     created_at: datetime.datetime
-    film_work_id: uuid.UUID = field(default_factory=uuid.uuid4)
-    person_id: uuid.UUID = field(default_factory=uuid.uuid4)
-    id: uuid.UUID = field(default_factory=uuid.uuid4)
+    film_work_id: uuid.UUID
+    person_id: uuid.UUID
+    id: uuid.UUID

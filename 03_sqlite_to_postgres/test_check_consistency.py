@@ -1,3 +1,5 @@
+import os
+
 from db_psycopg import get_cursor, pg_get_connection
 from db_sqlite import sqlite_get_connection
 
@@ -11,22 +13,31 @@ class ConsistencyChecker:
 
     def test_row_counts_equals(self, table_name):
         """Тест проверки количества строк в двух бд"""
-        rows_count_sqlite = self.get_data_from_table(self.conn_sqlite, table, only_count_rows=True)
+        rows_count_sqlite = self.get_data_from_table(self.conn_sqlite,
+                                                     table,
+                                                     only_count_rows=True)
         table_name_with_schema = f'content.{table_name}'
-        rows_count_pg = self.get_data_from_table(self.conn_pg, table_name_with_schema, only_count_rows=True)
-        assert rows_count_sqlite == rows_count_pg, 'Количество строк в таблицах разное!'
+        rows_count_pg = self.get_data_from_table(self.conn_pg,
+                                                 table_name_with_schema,
+                                                 only_count_rows=True)
+        assert rows_count_sqlite == rows_count_pg, 'Количество строк разное!'
         print(f'Количество строк в таблице {table_name} совпадает!')
 
     def test_data_equals(self, table_name):
         """Тест проверки данных"""
 
-        data_sqlite = self.get_data_from_table(self.conn_sqlite, table_name, only_count_rows=False)
+        data_sqlite = self.get_data_from_table(self.conn_sqlite,
+                                               table_name,
+                                               only_count_rows=False)
         table_name_with_schema = f'content.{table_name}'
-        data_postgres = self.get_data_from_table(self.conn_pg, table_name_with_schema, only_count_rows=False)
+        data_postgres = self.get_data_from_table(self.conn_pg,
+                                                 table_name_with_schema,
+                                                 only_count_rows=False)
 
-        # Т.к. мы могли бы не переносить поля создания и изменения, а проставлять например now()
-        # уберем их из проверки
-        skip_check_for_fields = ['created', 'created_at', 'updated_at', 'modified']
+        # Т.к. мы могли бы не переносить поля создания и изменения,
+        # а проставлять например now()? уберем их из проверки
+        skip_check_for_fields = ['created', 'created_at',
+                                 'updated_at', 'modified']
         for element in data_sqlite:
             for field in skip_check_for_fields:
                 if field in element.keys():
@@ -71,8 +82,13 @@ class ConsistencyChecker:
 
 
 if __name__ == '__main__':
-    dsl = {'dbname': 'movies_database', 'user': 'app', 'password': '123qwe', 'host': '127.0.0.1', 'port': 5432}
-    with sqlite_get_connection('db.sqlite') as sqlite_conn, pg_get_connection(dsl) as pg_conn:
+    dsl = {'dbname': os.environ.get('DB_NAME'),
+           'user': os.environ.get('DB_USER'),
+           'password': os.environ.get('DB_PASSWORD'),
+           'host': os.environ.get('DB_HOST'),
+           'port': os.environ.get('DB_PORT')}
+    with sqlite_get_connection('db.sqlite') as sqlite_conn,\
+            pg_get_connection(dsl) as pg_conn:
         checker = ConsistencyChecker(sqlite_conn, pg_conn)
         tables = checker.get_tables_names()
         for table in tables:
