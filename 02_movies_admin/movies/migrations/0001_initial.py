@@ -23,11 +23,11 @@ class Migration(migrations.Migration):
                 ('title', models.CharField(max_length=255, verbose_name='title')),
                 ('description', models.TextField(blank=True, verbose_name='description')),
                 ('creation_date', models.DateField(verbose_name='date')),
-                ('rating', models.FloatField(blank=True, validators=[django.core.validators.MinValueValidator(0),
-                                                                     django.core.validators.MaxValueValidator(100)],
+                ('rating', models.FloatField(blank=True, validators=[django.core.validators.MinValueValidator(0.0),
+                                                                     django.core.validators.MaxValueValidator(10.0)],
                                              verbose_name='rating')),
                 ('type',
-                 models.CharField(choices=[('movie', 'movie'), ('tv_show', 'tv_show')], default='', max_length=20,
+                 models.CharField(choices=[('movie', 'movie'), ('tv_show', 'tv_show')], default='movie', max_length=20,
                                   verbose_name='type')),
             ],
             options={
@@ -69,7 +69,7 @@ class Migration(migrations.Migration):
             name='PersonFilmWork',
             fields=[
                 ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('role', models.TextField(blank=True, verbose_name='role')),
+                ('role', models.CharField(choices=[('actor', 'actor'), ('director', 'director'), ('writer', 'writer')], default='actor', max_length=20, verbose_name='role')),
                 ('created', models.DateTimeField(auto_now_add=True)),
                 ('film_work', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='movies.filmwork')),
                 ('person', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='movies.person')),

@@ -41,19 +41,30 @@ class Filmwork(UUIDMixin, TimeStampedMixin):
     title = models.CharField(_('title'), max_length=255)
     description = models.TextField(_('description'), blank=True)
     creation_date = models.DateField(_('date'))
-    rating = models.FloatField(_('rating'), blank=True, validators=[MinValueValidator(0), MaxValueValidator(100)])
-    type = models.CharField(_('type'), max_length=20, choices=MovieTypes.choices, default='')
+    rating = models.FloatField(_('rating'),
+                               blank=True,
+                               validators=[MinValueValidator(0.0),
+                                           MaxValueValidator(10.0)])
+    type = models.CharField(_('type'),
+                            max_length=20,
+                            choices=MovieTypes.choices,
+                            default=MovieTypes.movie)
     genres = models.ManyToManyField('Genre', through='GenreFilmwork')
     persons = models.ManyToManyField('Person', through='PersonFilmWork')
-    file_path = models.FileField(_('file'), blank=True, null=True, upload_to='movies/')
+    file_path = models.FileField(_('file'),
+                                 blank=True,
+                                 null=True,
+                                 upload_to='movies/')
 
     class Meta:
         db_table = "content\".\"film_work"
         verbose_name = 'Кинопроизведение'
         verbose_name_plural = 'Кинопроизведения'
         indexes = [
-            models.Index(fields=['creation_date'], name='film_work_creation_date_idx'),
-            models.Index(fields=['title'], name='film_work_title_idx')
+            models.Index(fields=['creation_date'],
+                         name='film_work_creation_date_idx'),
+            models.Index(fields=['title'],
+                         name='film_work_title_idx')
         ]
 
     def __str__(self):
@@ -73,9 +84,21 @@ class Person(UUIDMixin, TimeStampedMixin):
 
 
 class PersonFilmWork(UUIDMixin):
+
+    class RoleTypes(models.TextChoices):
+        actor = 'actor', _('actor')
+        director = 'director', _('director')
+        writer = 'writer', _('writer')
+        # etc
+
     film_work = models.ForeignKey('Filmwork', on_delete=models.CASCADE)
     person = models.ForeignKey('Person', on_delete=models.CASCADE)
-    role = models.TextField(_('role'), blank=True)
+
+    role = models.CharField(_('role'),
+                            max_length=20,
+                            choices=RoleTypes.choices,
+                            default=RoleTypes.actor)
+
     created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
