@@ -1,5 +1,5 @@
 asgiref==3.5.0
-Django==3.2
+django>=3.2.12
 Faker==13.3.4
 flake8==4.0.0
 mccabe==0.6.1
