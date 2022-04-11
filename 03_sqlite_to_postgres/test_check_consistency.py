@@ -2,6 +2,9 @@ import os
 
 from db_psycopg import get_cursor, pg_get_connection
 from db_sqlite import sqlite_get_connection
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 class ConsistencyChecker:
